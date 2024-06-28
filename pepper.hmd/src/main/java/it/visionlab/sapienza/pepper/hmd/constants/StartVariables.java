@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StartVariables {
-    public static final boolean flagPepperHMDStarter = false;
-    public static final List<String> flagNames = new ArrayList<>(List.of("flag"));
+
+    public static final String stateId = "104";
+    public static final Boolean flagPepper = false;
+    public static final Boolean flagHMD = true;
+    public static final String stateName = "start";
+    public static final String chosenPlace = null;
 }

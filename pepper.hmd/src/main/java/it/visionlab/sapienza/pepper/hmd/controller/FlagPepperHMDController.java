@@ -1,7 +1,7 @@
 package it.visionlab.sapienza.pepper.hmd.controller;
 
 
-import it.visionlab.sapienza.pepper.hmd.model.FlagPepperHMD;
+import it.visionlab.sapienza.pepper.hmd.model.State;
 import it.visionlab.sapienza.pepper.hmd.service.FlagPepperHMDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,19 +17,32 @@ public class FlagPepperHMDController {
         this.flagPepperHMDService = flagPepperHMDService;
     }
 
-    @GetMapping("/getFlag")
-    public FlagPepperHMD getFlag(@RequestParam(required = true) String flagName) {
-        return flagPepperHMDService.getFlag(flagName);
+    @GetMapping("/getState")
+    public State getState() {
+        return flagPepperHMDService.getState();
     }
 
-    @PostMapping("/setFlag")
-    public void setFlag(@RequestParam(required = true) String flagName) {
-        flagPepperHMDService.setFlag(flagName);
+    @PostMapping("/setState")
+    public void setState(@RequestParam(required = true) Boolean flagPepper,
+                         @RequestParam(required = true) Boolean flagHMD,
+                         @RequestParam(required = true) String stateName,
+                         @RequestParam(required = true) String chosenPlace) {
+        flagPepperHMDService.setState(flagPepper, flagHMD, stateName, chosenPlace);
     }
 
-    @PutMapping("/switchFlag")
-    public void switchFlag(@RequestParam(required = true) String flagName) {
-        flagPepperHMDService.switchFlag(flagName);
+    @PutMapping("/activate")
+    public void activate(@RequestParam(required = true) String who) {
+        flagPepperHMDService.activate(who);
+    }
+
+    @PutMapping("/deactivate")
+    public void deactivate(@RequestParam(required = true) String who) {
+        flagPepperHMDService.deactivate(who);
+    }
+
+    @PutMapping("/nextState")
+    public void nextState(@RequestParam(required = true) String stateName) {
+        flagPepperHMDService.nextState(stateName);
     }
 
 }

@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-import static it.visionlab.sapienza.pepper.hmd.constants.StartVariables.flagNames;
+import static it.visionlab.sapienza.pepper.hmd.constants.StartVariables.*;
 
 @SpringBootApplication
 public class PepperServerHmdApplication {
@@ -27,8 +27,6 @@ class FlagInitializer implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		for (String flagName : flagNames) {
-			flagPepperHMDService.setFlag(flagName);
-		}
+		flagPepperHMDService.setState(flagPepper, flagHMD, stateName, chosenPlace);
 	}
 }

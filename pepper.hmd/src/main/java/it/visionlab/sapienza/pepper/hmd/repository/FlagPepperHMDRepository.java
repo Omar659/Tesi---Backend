@@ -1,6 +1,6 @@
 package it.visionlab.sapienza.pepper.hmd.repository;
 
-import it.visionlab.sapienza.pepper.hmd.model.FlagPepperHMD;
+import it.visionlab.sapienza.pepper.hmd.model.State;
 import lombok.extern.java.Log;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -8,7 +8,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import static it.visionlab.sapienza.pepper.hmd.constants.StartVariables.flagPepperHMDStarter;
+import java.util.Objects;
+import static it.visionlab.sapienza.pepper.hmd.constants.StartVariables.stateId;
 
 @Log
 @Repository
@@ -19,55 +20,47 @@ public class FlagPepperHMDRepository {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public void setFlag(String flagName) {
-        if (!existFlag(flagName)) {
-            FlagPepperHMD flagPepperHMD = new FlagPepperHMD(flagName, flagPepperHMDStarter);
-            mongoTemplate.save(flagPepperHMD);
-            log.info("New Flag added and set");
-        } else {
-            Query query = new Query(Criteria.where("flagName").is(flagName));
-            Update update = new Update().set("value", flagPepperHMDStarter);
-            mongoTemplate.updateFirst(query, update, FlagPepperHMD.class);
-            log.info("Flag value set to 0");
-        }
+    public void setState(Boolean flagPepper, Boolean flagHMD, String stateName, String chosenPlace) {
+        State state = new State(stateId, flagPepper,flagHMD,stateName,chosenPlace);
+        mongoTemplate.save(state);
     }
 
-    public Boolean existFlag(String flagName) {
-        Query query = new Query(Criteria.where("flagName").is(flagName));
-        Boolean exist = mongoTemplate.exists(query, FlagPepperHMD.class);
-        log.info("Flag " + flagName + (exist ? "exist" : "not exist"));
-        return exist;
+    public void activate(String who) {
+        Query query = new Query(Criteria.where("stateId").is(stateId));
+        State state = mongoTemplate.findOne(query, State.class);
+        assert state != null;
+        Update update;
+        if (Objects.equals(who, "pepper")) {
+            update = new Update().set("flagPepper", true);
+        } else {
+            update = new Update().set("flagHMD", true);
+        }
+        mongoTemplate.updateFirst(query, update, State.class);
     }
 
-    public void switchFlag(String flagName) {
-        Query query = new Query(Criteria.where("flagName").is(flagName));
-        FlagPepperHMD flag = mongoTemplate.findOne(query, FlagPepperHMD.class);
-
-        if (flag != null) {
-            // Get the actual value of the flag
-            Boolean currentValue = flag.getValue();
-
-            // Switch the value
-            Boolean newValue = !currentValue;
-
-            // Update the document in the DB with the new value
-            Update update = new Update().set("value", newValue);
-            mongoTemplate.updateFirst(query, update, FlagPepperHMD.class);
-
-            log.info("Flag " + flagName + " switched to " + newValue);
+    public void deactivate(String who) {
+        Query query = new Query(Criteria.where("stateId").is(stateId));
+        State state = mongoTemplate.findOne(query, State.class);
+        assert state != null;
+        Update update;
+        if (Objects.equals(who, "pepper")) {
+            update = new Update().set("flagPepper", false);
         } else {
-            log.warning("Flag " + flagName + " not found");
+            update = new Update().set("flagHMD", false);
         }
+        mongoTemplate.updateFirst(query, update, State.class);
     }
 
-    public FlagPepperHMD getFlag(String flagName) {
-        if (existFlag(flagName)) {
-            Query query = new Query(Criteria.where("flagName").is(flagName));
-            log.info("Flag " + flagName + " get");
-            return mongoTemplate.findOne(query, FlagPepperHMD.class);
-        } else {
-            log.warning("Flag " + flagName + " not found");
-            return null;
-        }
+    public State getState() {
+        Query query = new Query(Criteria.where("flagName").is(stateId));
+        return mongoTemplate.findOne(query, State.class);
+    }
+
+    public void nextState(String stateName) {
+        Query query = new Query(Criteria.where("stateId").is(stateId));
+        State state = mongoTemplate.findOne(query, State.class);
+        assert state != null;
+        Update update = new Update().set("chosenPlace", stateName);
+        mongoTemplate.updateFirst(query, update, State.class);
     }
 }

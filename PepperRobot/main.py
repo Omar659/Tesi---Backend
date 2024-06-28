@@ -59,8 +59,6 @@ while True:
         print("CHECK SULLA CHIAMATA API\t\t\tflagName: " + response["flagName"] + "; value: " + str(response["value"]) + "; doAction: " + str(doAction))
 
 
-    time.sleep(0.1)
-
 
 
 # # Connect to the robot fails at app.start() => RuntimeError: disconnected
